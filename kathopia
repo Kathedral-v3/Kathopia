@@ -1,0 +1,327 @@
+#!/bin/bash
+mwv="\e[92m"
+wtl="\e[91m"
+lrj="\e[34m"
+ttr="\e[30m"
+yvt="\e[93m"
+blank="\e[39m"
+app=$0
+torrange="192.168.0.0/16 172.16.0.0/12 10.0.0.0/8"
+startup=$(echo "$(pwd)/${app}" | sed 's/\/.\//\//g')
+echo -e "
+$mwv _______               ${wtl}__  $mwv __  __         __   __             __              __ ${blank}
+$mwv|_     _|.-----.----.${wtl}_|  |_$mwv|  |/  |.---.-.|  |_|  |--.-----.--|  |.----.---.-.|  |${blank}
+$mwv  |   |  |  _  |   _${wtl}|_    _|$mwv     < |  _  ||   _|     |  -__|  _  ||   _|  _  ||  |${blank}
+$mwv  |___|  |_____|__|   ${wtl}|__| $mwv|__|\__||___._||____|__|__|_____|_____||__| |___._||__|${blank}
+
+						        ${ttr}███████ ${blank}   
+						    ${ttr}▄▄▄▄███████▄▄▄▄${blank}
+						       ▐░▀░▀░▀░▌ 
+						       ${wtl}▐▄▄▄▄▄▄▄▌${blank}
+						 ▄▀▀▀█▒▐░${wtl}▀▀${blank}▄${wtl}▀▀${blank}░▌▒█▀▀▀▄
+						 ▌▌▌▌▐▒▄▌░▄▄▄░▐▄▒▌▐▐▐▐
+        ${mwv}0x54 0x6F 0x72 ${wtl}[0x2B]$mwv 0x4B 0x61 0x74 0x68 0x65 0x64 0x72 0x61 0x6C${blank} 
+        
+        $mwv[${wtl}----------------------------------------------------------------$mwv]${blank}  
+        $mwv[${wtl}---$mwv]        პროდუქტი წარმოადგენს ${wtl}Kathedral$mwv-ის საკუთრებას    [${wtl}---$mwv]${blank}
+        $mwv[${wtl}---$mwv]                 პროექტის ავტორი: Pwn${wtl}3Xpert$mwv             [${wtl}---$mwv]${blank}
+        $mwv[${wtl}----------------------------------------------------------------$mwv]${blank}
+
+        $mwv[${yvt}ინფო$mwv]: ${yvt}ნავიგაციის სანახავად გაწერეთ: 
+
+${mwv}-_*${mwv}/${wtl}Kathopia${mwv}/>${wtl}# ${mwv}$0 ${wtl}-h ${mwv}ან ${wtl}--help${blank}"
+
+
+if [[ ! -z `dpkg -l |grep resolvconf` ]]; then 
+	resolvconf_support=true;
+else
+	resolvconf_support=false;
+fi
+install() {
+if [[ -n $(cat /etc/os-release | grep "kali") ]]
+then
+	echo "მიმდინარეობს ინსტალაცია გთხოვთ დაიცადოთ..."
+	apt  install --force-yes secure-delete tor libecj-java libservlet3.0-java libgetopt-java libservlet3.0-java glassfish-javaee ttf-dejavu libjbigi-jni > /dev/null 2>&1
+	wget http://ftp.us.debian.org/debian/pool/main/j/jetty8/libjetty8-java_8.1.16-4_all.deb > /dev/null 2>&1
+	dpkg -i libjetty8-java_8.1.16-4_all.deb > /dev/null 2>&1
+	apt install -f > /dev/null 2>&1
+fi
+}
+startup() {
+read -p "გსურთ დაემატოს სტარტაპში რათა სისტემის ჩატვირთვისთანავე ავტომატურად ჩაიტვირთოს kathopia? მაშინ დააჭირეთ (Y/y)-ს ხოლო თუ გსურთ ამოშალოთ მაშინ დააჭირეთ (N/n)-ს" -n 1 -r
+echo
+if [[ ! $REPLY =~ ^[Yy]$ ]]
+then
+cp {startup} /etc/init.d
+fi
+}
+clearlog() {
+	   echo -e $yvt "[${wtl}!$yvt]: $wtlმიმდინარეობს ქეშების დასუფთავება. შესაძლოა ამას დასჭირდეს რამოდენიმე წუთი"
+	   sleep 5
+	   rm /var/log/auth.log
+       truncate -s 0 /var/log/auth.log
+	   echo '' > /var/log/auth.log
+	   shred /var/log/auth.log
+	   rm -rf ~/.BurpSuite
+	   rm -rf ~/.ssh
+	   ln /dev/null /var/log/auth.log -sf
+	   shred -zu /var/log/auth.log
+	   echo "" > ~/.bash_history
+	   echo 0  > /proc/sys/vm/oom_dump_tasks
+	   echo 1  > /proc/sys/vm/oom_kill_allocating_task
+	   echo 1  > /proc/sys/vm/overcommit_memory
+	   echo 3  > /proc/sys/vm/drop_caches
+	   echo 1024 > /proc/sys/vm/min_free_kbytes
+       echo '' > /var/log/messages 
+       echo '' > /var/log/auth.log 
+       echo '' > /var/log/kern.log 
+       echo '' > /var/log/cron.log 
+       echo '' > /var/log/maillog 
+       echo '' > /var/log/boot.log 
+       echo '' > /var/log/mysqld.log 
+       echo '' > /var/log/qmail 
+       echo '' > /var/log/httpd 
+       echo '' > /var/log/lighttpd 
+       echo '' > /var/log/secure 
+       echo '' > /var/log/utmp 
+       echo '' > /var/log/wtmp 
+       echo '' > /var/log/yum.log
+       echo '' > /var/log/system.log 
+       echo '' > /var/log/DiagnosticMessages
+       echo '' > /Library/Logs 
+       echo '' > /Library/Logs/DiagnosticReports
+       echo '' > ~/Library/Logs 
+       echo '' > ~/Library/Logs/DiagnosticReports
+       shred -zu /var/log/messages
+       shred -zu /var/log/auth.log 
+       shred -zu /var/log/kern.log 
+       shred -zu /var/log/cron.log 
+       shred -zu /var/log/maillog
+       shred -zu /var/log/boot.log 
+       shred -zu /var/log/mysqld.log 
+       shred -zu /var/log/qmail 
+       shred -zu /var/log/httpd 
+       shred -zu /var/log/lighttpd 
+       shred -zu /var/log/secure
+       shred -zu /var/log/utmp
+       shred -zu /var/log/wtmp
+       shred -zu /var/log/system.log
+       shred -zu /var/log/DiagnosticMessages 
+       shred -zu /Library/Logs
+       shred -zu /Library/Logs/DiagnosticReports
+       shred -zu ~/Library/Logs 
+       shred -zu ~/Library/Logs/DiagnosticReports 
+       sdmem -fllv
+	   killall -q chrome dropbox iceweasel skype icedove thunderbird firefox chromium xchat transmission deluge pidgin pidgin.orig
+	   bleachbit -c adobe_reader.cache chromium.cache chromium.current_session chromium.history elinks.history emesene.cache epiphany.cache firefox.url_history flash.cache flash.cookies google_chrome.cache google_chrome.history  links2.history opera.cache opera.search_history opera.url_history &> /dev/null
+}
+ip() {
+myip=$(curl -s "ifconfig.me")
+echo -e " ${mwv}[${wtl}+$mwv]: შენი ტუნელირებადი აიპია: ${wtl}${myip}${blank}" 
+}
+
+activation() {
+	if [ $(id -u) -ne 0 ]; then
+		exit 1
+	fi
+	grep -q -x 'RUN_DAEMON="yes"' /etc/default/tor
+	if [ $? -ne 0 ]; then
+		echo "მიმდინარეობს TOR-ის კონფიგურირება დასრულების შემდეგ ხელახლა ჩატვირთეთ აპლიკაცია..."
+		service tor restart
+		exit 1
+	fi	
+	echo -e "$yvt [${wtl}*$yvt]: თქვენი რეალური აიპი მისამართი შეცვლილია "
+	sed -i '/^.*\#Kathopia Has HERE$/d' /etc/sysctl.conf
+	echo "net.ipv6.conf.all.disable_ipv6 = 1 #Kathopia Has HERE" >> /etc/sysctl.conf
+	echo "net.ipv6.conf.default.disable_ipv6=1 #Kathopia Has HERE" >> /etc/sysctl.conf
+	sysctl -p > /dev/null
+	if [ ! -e /var/run/tor/tor.pid ]; then
+		service network-manager force-reload > /dev/null 2>&1
+		killall dnsmasq > /dev/null 2>&1
+		killall nscd > /dev/null 2>&1	
+		service tor start
+		sleep 1
+	fi
+	if ! [ -f /etc/network/iptables.rules ]; then
+		iptables-save > /etc/network/iptables.rules
+	fi
+	
+	iptables -F
+	iptables -t nat -F
+	
+	if [ "$resolvconf_support" = false ] 
+	then
+		cp /etc/resolv.conf /etc/resolv.conf.bak
+		touch /etc/resolv.conf
+		echo -e 'nameserver 127.0.0.1\nnameserver 209.222.18.222\nnameserver 209.222.18.218' > /etc/resolv.conf
+	else
+		cp /etc/resolvconf/resolv.conf.d/head{,.bak}
+        echo -e 'nameserver 127.0.0.1\nnameserver 209.222.18.222\nnameserver 209.222.18.218' >> /etc/resolvconf/resolv.conf.d/head
+        resolvconf -u
+	fi
+	echo -e "$yvt [${wtl}*$yvt]: თქვენს ანონიმურობაზე ზრუნავს ${wtl}TOR${yvt}-ი!";
+
+	iptables -t nat -A OUTPUT -m owner --uid-owner debian-tor -j RETURN
+	iptables -t nat -A OUTPUT -p udp --dport 53 -j REDIRECT --to-ports 53
+	iptables -t nat -A OUTPUT -p tcp --dport 53 -j REDIRECT --to-ports 53
+	iptables -t nat -A OUTPUT -p udp -m owner --uid-owner debian-tor -m udp --dport 53 -j REDIRECT --to-ports 53
+	iptables -t nat -A OUTPUT -p tcp -d 10.192.0.0/10 -j REDIRECT --to-ports 9040
+	iptables -t nat -A OUTPUT -p udp -d 10.192.0.0/10 -j REDIRECT --to-ports 9040
+	for range in $torrange 127.0.0.0/9 127.128.0.0/10; do
+	iptables -t nat -A OUTPUT -d $range -j RETURN
+	done
+	iptables -t nat -A OUTPUT -p tcp --syn -j REDIRECT --to-ports 9040
+	iptables -t nat -A OUTPUT -p udp -j REDIRECT --to-ports 9040
+	iptables -t nat -A OUTPUT -p icmp -j REDIRECT --to-ports 9040
+	iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+	for range in $torrange 127.0.0.0/8; do
+	iptables -A OUTPUT -d $range -j ACCEPT
+	done
+	iptables -A OUTPUT -m owner --uid-owner debian-tor -j ACCEPT
+	iptables -A OUTPUT -j REJECT
+	echo -e "$mwv [${wtl}+$mwv]: თქვენი ამჟამინდელი ტუნელირებადი მისამართია: $wtl $myip"
+	echo -e "$mwv [${wtl}+$mwv]: თქვენი ტრაფიკის ტუნელირება წარმატებით დასრულდა თქვენ უკვე ანონიმური ხართ."
+}
+random() {
+service tor reload > /dev/null 2>&1
+torreload="$?"
+ if [ $torreload == "0" ]
+then
+	echo -e "$mwv [${yvt}ინფო$mwv]: ${mwv}თქვენი აიპი მისამართი შეიცვალა${blank}"
+	ip
+elif [ $torreload == "1" ]
+then
+    echo -e $yvt "[${wtl}!$yvt]: ${wtl}tor.service არარის აქტიური, რომ მოხდეს გადატვირთვა"
+fi
+}
+
+status() {
+if [[ $(service tor status  | grep 'Active: active') ]]
+then
+	echo -e "$mwv [${yvt}ინფო$mwv]: ${mwv}tor.service აქტიურია${blank}"
+else
+
+    echo -e $yvt "[${wtl}!$yvt]: ${wtl}tor.service არარის აქტიური, გთხოვთ გააქტიუროთ ხელით."
+fi
+
+}
+deactivation() {
+	echo -e "$mwv [${wtl}-$mwv]: მიმდინარეობს აპლიკაციის დეაქტივაცია"
+
+	iptables -F
+	iptables -t nat -F
+	
+	if [ -f /etc/network/iptables.rules ]; then
+		iptables-restore < /etc/network/iptables.rules
+		rm /etc/network/iptables.rules
+	fi
+	if [ "$resolvconf_support" = false ] 
+	then
+		if [ -e /etc/resolv.conf.bak ]; then
+			rm /etc/resolv.conf
+			cp /etc/resolv.conf.bak /etc/resolv.conf
+		fi
+	else
+		mv /etc/resolvconf/resolv.conf.d/head{.bak,}
+		resolvconf -u
+	fi
+	
+	service tor stop
+	sed -i '/^.*\#Kathopia Has HERE$/d' /etc/sysctl.conf
+	sysctl -p 
+
+	service network-manager force-reload > /dev/null 2>&1
+	service nscd start > /dev/null 2>&1
+	service dnsmasq start > /dev/null 2>&1
+	}
+checknet() {
+		chknet() {
+		ping -c 1 8.8.4.4 > /dev/null 2>&1
+		png="$?"
+		 if [ $png == "0" ]
+		then
+		echo -e $lrj "[${wtl}X$lrj]: წარმოიქმნა სინტაქსური პრობლემა"
+		read continue
+		    sleep 0.5
+		    exit
+		elif [ $png == "1" ]
+		then
+		    echo -e $yvt "[${wtl}!$yvt]: თქვენ ხართ ლოკალურ ქსელში"
+			sleep 0.5
+			exit
+		elif [ $png == "2" ]
+		then
+		echo -e $wtl "[-]: თქვენ არ ხართ ინტერნეტთან დაკავშირებული!"
+		read continue
+		    sleep 0.5
+		   	exit
+		fi
+		}
+	echo -e "GET http://google.com HTTP/1.0\n\n" | nc google.com 80 > /dev/null 2>&1
+	if [ $? -ne 0 ]; then
+	echo -e $wtl "[-]: ინტერნეტთან კავშირი : დაუმყარებელია";
+	chknet
+	    sleep 1
+	else
+	echo -e $mwv "[${wtl}+$mwv]: ინტერნეტთან კავშირი : დამყარებულია";
+	    sleep 1  
+	fi
+	}
+if [[ $* == "-s" ]] || [[ $* == "--start" ]]; then
+	activation
+	checknet
+elif [[ $* == "start" ]] || [[ $* == "--start" ]]; then
+	activation
+	checknet
+elif [[ $* == "stop" ]] || [[ $* == "--stop" ]]; then
+	deactivation
+	checknet
+elif [[ $* == "-x" ]] || [[ $* == "--stop" ]]; then
+	deactivation
+	checknet
+elif [[ $* == "-r" ]] || [[ $* == "--randomip" ]]; then
+	random
+	checknet
+elif [[ $* == "random" ]] || [[ $* == "--randomip" ]]; then
+	random
+	checknet
+elif [[ $* == "-R" ]] || [[ $* == "--restart" ]]; then
+	deactivation
+	sleep 1
+	checknet
+	activation
+elif [[ $* == "-c" ]] || [[ $* == "--checkmynet" ]]; then
+  	checknet
+ 	 ip
+elif [[ $* == "-S" ]] || [[ $* == "--status" ]]; then
+  	status
+elif [[ $* == "status" ]] || [[ $* == "--status" ]]; then
+  	status
+elif [[ $* == "-i" ]] || [[ $* == "--install" ]]; then
+  	install
+elif [[ $* == "-si" ]] || [[ $* == "--startup" ]]; then
+  	startup
+elif [[ $* == "-cl" ]] || [[ $* == "--clearlog" ]]; then
+  	clearlog
+elif [[ $* == "-h" ]] || [[ $* == "--help" ]]; then
+	echo -e "
+
+${mwv}ნავგაცია:
+$yvt┌───────────────────────────────────────────────────────────────┐
+$yvt│ ${wtl}_     _ _______ _______ _     _  _____   _____  _____ _______ $yvt│
+$yvt│ ${wtl}|____/  |_____|    |    |_____| |     | |_____]   |   |_____| $yvt│
+$yvt│ ${wtl}|    \_ |     |    |    |     | |_____| |       __|__ |     | $yvt│
+$yvt│                                                               │
+$yvt├─────────────────────┬─────────────────────────────────────────┤
+$yvt│ ${wtl}-i  ${mwv}|${wtl} --install$blank     $yvt│ $mwvბიბლიოთეკების ინსტალაცია$blank                $yvt│
+$yvt│ ${wtl}-si ${mwv}|${wtl} --startup$blank     $yvt│ $mwvავტომატური ჩატვირთვა$blank                    $yvt│
+$yvt│ ${wtl}-cl ${mwv}|${wtl} --clearlog$blank    $yvt│ $mwvჩანაწერების/ქეშების/ლოგების ამოშლა$blank      $yvt│
+$yvt├─────────────────────┼─────────────────────────────────────────┤
+$yvt│ ${wtl}-s  ${mwv}|${wtl} --start$blank       $yvt│ $mwvანონიმურობის აქტივაცია$blank                  $yvt│
+$yvt│ ${wtl}-x  ${mwv}|${wtl} --stop$blank        $yvt│ $mwvანონიმურობის დეაქტივაცია$blank                $yvt│
+$yvt│ ${wtl}-R  ${mwv}|${wtl} --restart$blank     $yvt│ $mwvაპლიკაციის ახლიდან ჩატვირთვა$blank            $yvt│
+$yvt│ ${wtl}-r  ${mwv}|${wtl} --reload$blank      $yvt│ $mwv$mwvაიპი მისამართის შეცვლა$blank                  $yvt│
+$yvt│ ${wtl}-S  ${mwv}|${wtl} --status$blank      $yvt│ $mwvსტატუსი გამართულობის შესახებ$blank            $yvt│
+$yvt│ ${wtl}-c  ${mwv}|${wtl} --checkmynet$blank  $yvt│ $mwvმაჩვენე ჩემი ამჟამინდელი აიპი$blank           $yvt│
+$yvt└─────────────────────┴─────────────────────────────────────────┘"
+fi
