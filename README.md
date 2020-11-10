@@ -7,5 +7,5 @@
 <a href=""><img alt="Software License" src="https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square"></a>
 <a href=""><img alt="tested" src="https://img.shields.io/badge/tested-Linux%2fOSX-red.svg"></a>
 <p align="center">
-<img alt="csg" src="https://kathedral.cybsecgroup.com/img/csg.png" height="140" />
+<img alt="kathedral" src="https://avatars2.githubusercontent.com/u/73682561?s=400&u=b887d6b25588baf43d7a82754c8b1c1552a3c539&v=4" height="140" />
 </p>
